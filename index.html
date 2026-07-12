@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SICSa - Constancia de Movimiento</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #e8ecf1;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        
+        .paper {
+            max-width: 480px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            overflow: hidden;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            background: #1a472a;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .info-card {
+            background: #f0fdf4;
+            border-left: 4px solid #1a472a;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        
+        .info-card p {
+            margin: 4px 0;
+        }
+        
+        .ticket-preview {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow: auto;
+        }
+        
+        .ticket-preview::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .ticket-preview::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        
+        .ticket-preview::-webkit-scrollbar-thumb {
+            background: #1a472a;
+            border-radius: 10px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 10px;
+        }
+        
+        button:active {
+            transform: scale(0.97);
+        }
+        
+        .btn-primary {
+            background: #1a472a;
+            color: white;
+            box-shadow: 0 2px 8px rgba(26,71,42,0.3);
+        }
+        
+        .btn-primary:hover {
+            background: #0e2a1a;
+        }
+        
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #475569;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .flex-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .flex-buttons button {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .status {
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 12px;
+        }
+        
+        .status-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-warning {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+        
+        hr {
+            margin: 16px 0;
+            border: none;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: #94a3b8;
+            padding: 16px 20px;
+            background: #f8fafc;
+        }
+        
+        .badge-tipo {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .badge-recaudo {
+            background: #1a472a;
+        }
+        
+        .badge-egreso {
+            background: #dc3545;
+        }
+        
+        .badge-compra {
+            background: #6f42c1;
+        }
+        
+        .badge-saldado {
+            background: #28a745;
+        }
+        
+        .badge-pendiente {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .badge-completado {
+            background: #17a2b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="paper">
+        <div class="header">
+            <h1>🏦 SICSa</h1>
+            <p>Sistema de Cobros - Constancia de Movimiento</p>
+        </div>
+        
+        <div class="content">
+            <div id="infoCobro" class="info-card">
+                <p>📄 Cargando información del movimiento...</p>
+            </div>
+            
+            <div id="ticketPreview" class="ticket-preview">
+                ⏳ Generando constancia...
+            </div>
+            
+            <button id="btnImprimir" class="btn-primary">🖨️ IMPRIMIR CONSTANCIA</button>
+            
+            <div class="flex-buttons">
+                <button id="btnCopiar" class="btn-secondary">📋 COPIAR</button>
+                <button id="btnCerrar" class="btn-danger">❌ CERRAR</button>
+            </div>
+            
+            <div id="status" class="status status-info">
+                ⚪ Listo para imprimir
+            </div>
+        </div>
+        
+        <div class="footer">
+            Conecta tu impresora en RawBT | PIN: 0000
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // VARIABLES GLOBALES
+        // ============================================================
+        let ticketTexto = '';
+        let datosCobro = null;
+        let montoNumerico = 0;
+        
+        // ============================================================
+        // LEER DATOS DE LA URL (lo que envía SICSa)
+        // ============================================================
+        function leerDatosURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // ============================================================
+            // 🔥 RECIBIR TODOS LOS DATOS DEL MOVIMIENTO (INCLUYENDO COMPRA)
+            // ============================================================
+            datosCobro = {
+                id: urlParams.get('id') || 'S/N',
+                factura: urlParams.get('factura') || 'S/N',
+                cliente: urlParams.get('cliente') || 'Consumidor Final',
+                clienteID: urlParams.get('clienteID') || '',
+                monto: urlParams.get('monto') || '0',
+                fechaCobro: urlParams.get('fechaCobro') || new Date().toLocaleDateString(),
+                trabajador: urlParams.get('trabajador') || 'Sistema',
+                trabajadorCodigo: urlParams.get('trabajadorCodigo') || '',
+                saldoAnterior: urlParams.get('saldoAnterior') || '0',
+                nuevoSaldo: urlParams.get('nuevoSaldo') || '0',
+                estado: urlParams.get('estado') || 'PENDIENTE',
+                fechaRegistro: urlParams.get('fechaRegistro') || '',
+                horaRegistro: urlParams.get('horaRegistro') || '',
+                observaciones: urlParams.get('observaciones') || '',
+                numFacturaSIIGO: urlParams.get('numFacturaSIIGO') || '',
+                cod1: urlParams.get('cod1') || '',
+                cod2: urlParams.get('cod2') || '',
+                tipoOperacion: urlParams.get('tipoOperacion') || 'RECAUDO',
+                // 🔥 NUEVO: Campos específicos para COMPRA
+                kilosCompra: urlParams.get('kilosCompra') || '0',
+                valorUnitCompra: urlParams.get('valorUnitCompra') || '0'
+            };
+            
+            montoNumerico = parseFloat(datosCobro.monto) || 0;
+            
+            mostrarInfoCobro();
+            ticketTexto = generarTicketTexto();
+            document.getElementById('ticketPreview').innerText = ticketTexto;
+            
+            return datosCobro.factura !== 'S/N' || datosCobro.tipoOperacion !== 'RECAUDO';
+        }
+        
+        // ============================================================
+        // MOSTRAR INFORMACIÓN DEL MOVIMIENTO
+        // ============================================================
+        function mostrarInfoCobro() {
+            const container = document.getElementById('infoCobro');
+            
+            // Determinar badge según tipo
+            let badgeTipo = '';
+            if (datosCobro.tipoOperacion === 'EGRESO') {
+                badgeTipo = '<span class="badge-tipo badge-egreso">💸 EGRESO</span>';
+            } else if (datosCobro.tipoOperacion === 'COMPRA') {
+                badgeTipo = '<span class="badge-tipo badge-compra">🛒 COMPRA</span>';
+            } else {
+                badgeTipo = '<span class="badge-tipo badge-recaudo">📝 RECAUDO</span>';
+            }
+            
+            // Determinar badge de estado
+            let badgeEstado = '';
+            if (datosCobro.estado === 'SALDADO') {
+                badgeEstado = '<span class="badge-tipo badge-saldado">✅ SALDADO</span>';
+            } else if (datosCobro.estado === 'COMPLETADO') {
+                badgeEstado = '<span class="badge-tipo badge-completado">✅ COMPLETADO</span>';
+            } else {
+                badgeEstado = '<span class="badge-tipo badge-pendiente">⏳ PENDIENTE</span>';
+            }
+            
+            let observacionesHtml = '';
+            if (datosCobro.observaciones && datosCobro.observaciones.trim() !== '') {
+                observacionesHtml = `<p><strong>💬 OBSERVACIONES:</strong> ${escapeHtml(datosCobro.observaciones)}</p>`;
+            }
+            
+            // Mostrar información según tipo
+            let infoHtml = '';
+            
+            if (datosCobro.tipoOperacion === 'RECAUDO') {
+                infoHtml = `
+                    <p><strong>📄 FACTURA #:</strong> ${datosCobro.factura}</p>
+                    <p><strong>👤 CLIENTE:</strong> ${escapeHtml(datosCobro.cliente)}</p>
+                    <p><strong>💰 MONTO:</strong> $${montoNumerico.toLocaleString()}</p>
+                    <p><strong>📅 FECHA COBRO:</strong> ${datosCobro.fechaCobro}</p>
+                    <p><strong>👨‍💼 VENDEDOR:</strong> ${escapeHtml(datosCobro.trabajador)}${datosCobro.trabajadorCodigo ? ' (' + datosCobro.trabajadorCodigo + ')' : ''}</p>
+                    <p><strong>📊 SALDO ANTERIOR:</strong> $${parseFloat(datosCobro.saldoAnterior).toLocaleString()}</p>
+                    <p><strong>📊 NUEVO SALDO:</strong> $${parseFloat(datosCobro.nuevoSaldo).toLocaleString()}</p>
+                    <p><strong>📌 ESTADO:</strong> ${badgeEstado}</p>
+                    <p><strong>🔖 TIPO:</strong> ${badgeTipo}</p>
+                    ${datosCobro.numFacturaSIIGO ? `<p><strong>🔢 SIIGO:</strong> ${datosCobro.numFacturaSIIGO}</p>` : ''}
+                    ${datosCobro.cod1 ? `<p><strong>📌 COD_1:</strong> ${datosCobro.cod1}</p>` : ''}
+                    ${datosCobro.cod2 ? `<p><strong>📌 COD_2:</strong> ${datosCobro.cod2}</p>` : ''}
+                    ${observacionesHtml}
+                `;
+            } else if (datosCobro.tipoOperacion === 'EGRESO') {
+                infoHtml = `
+                    <p><strong>💸 TIPO:</strong> ${badgeTipo}</p>
+                    <p><strong>🏦 CUENTA DÉBITO:</strong> ${escapeHtml(datosCobro.trabajador)}</p>
+                    <p><strong>🔢 CÓDIGO DÉBITO:</strong> ${datosCobro.trabajadorCodigo || 'N/A'}</p>
+                    <p><strong>🏦 CUENTA CRÉDITO:</strong> ${escapeHtml(datosCobro.cliente)}</p>
+                    <p><strong>🔢 CÓDIGO CRÉDITO:</strong> ${datosCobro.clienteID || 'N/A'}</p>
+                    <p><strong>💰 MONTO:</strong> $${montoNumerico.toLocaleString()}</p>
+                    <p><strong>📅 FECHA:</strong> ${datosCobro.fechaCobro}</p>
+                    <p><strong>📌 ESTADO:</strong> ${badgeEstado}</p>
+                    ${datosCobro.cod1 ? `<p><strong>📌 COD_1:</strong> ${datosCobro.cod1}</p>` : ''}
+                    ${datosCobro.cod2 ? `<p><strong>📌 COD_2:</strong> ${datosCobro.cod2}</p>` : ''}
+                    ${observacionesHtml}
+                `;
+            } else if (datosCobro.tipoOperacion === 'COMPRA') {
+                const kilos = parseFloat(datosCobro.kilosCompra) || 0;
+                const valorUnit = parseFloat(datosCobro.valorUnitCompra) || 0;
+                
+                infoHtml = `
+                    <p><strong>🛒 TIPO:</strong> ${badgeTipo}</p>
+                    <p><strong>🏦 CUENTA DÉBITO:</strong> ${escapeHtml(datosCobro.trabajador)}</p>
+                    <p><strong>🔢 CÓDIGO DÉBITO:</strong> ${datosCobro.trabajadorCodigo || 'N/A'}</p>
+                    <p><strong>🏦 CUENTA CRÉDITO:</strong> ${escapeHtml(datosCobro.cliente)}</p>
+                    <p><strong>🔢 CÓDIGO CRÉDITO:</strong> ${datosCobro.clienteID || 'N/A'}</p>
+                    <p><strong>📦 KILOS:</strong> ${kilos.toFixed(2)}</p>
+                    <p><strong>💰 VALOR UNITARIO:</strong> $${valorUnit.toLocaleString()}</p>
+                    <p><strong>💰 MONTO TOTAL:</strong> $${montoNumerico.toLocaleString()}</p>
+                    <p><strong>📅 FECHA:</strong> ${datosCobro.fechaCobro}</p>
+                    <p><strong>📌 ESTADO:</strong> ${badgeEstado}</p>
+                    ${datosCobro.cod1 ? `<p><strong>📌 COD_1:</strong> ${datosCobro.cod1}</p>` : ''}
+                    ${datosCobro.cod2 ? `<p><strong>📌 COD_2:</strong> ${datosCobro.cod2}</p>` : ''}
+                    ${observacionesHtml}
+                `;
+            }
+            
+            container.innerHTML = infoHtml;
+        }
+        
+        // ============================================================
+        // GENERAR TICKET EN TEXTO PLANO - VERSIÓN ADAPTATIVA
+        // ============================================================
+        function generarTicketTexto() {
+            const ancho = 48;
+            let t = '';
+            
+            // ========== ENCABEZADO ==========
+            t += '_'.repeat(ancho) + '\n';
+            t += centerText('CONSTANCIA DE MOVIMIENTO FINANCIERO', ancho) + '\n';
+            t += centerText('SICSa - Sistema de Cobros', ancho) + '\n';
+            t += '_'.repeat(ancho) + '\n';
+            
+            // ========== TIPO DE MOVIMIENTO ==========
+            const tipo = datosCobro.tipoOperacion || 'RECAUDO';
+            let tipoLabel = '📝 RECAUDO';
+            if (tipo === 'EGRESO') {
+                tipoLabel = '💸 EGRESO';
+            } else if (tipo === 'COMPRA') {
+                tipoLabel = '🛒 COMPRA';
+            }
+            
+            t += centerText(tipoLabel, ancho) + '\n';
+            t += '_'.repeat(ancho) + '\n';
+            
+            // ========== NÚMERO Y FECHA ==========
+            t += `CONSTANCIA # : ${datosCobro.id}\n`;
+            t += `FECHA        : ${datosCobro.fechaCobro}\n`;
+            if (datosCobro.horaRegistro) {
+                t += `HORA         : ${datosCobro.horaRegistro}\n`;
+            }
+            t += '_'.repeat(ancho) + '\n';
+            
+            // ========== DETALLE SEGÚN TIPO ==========
+            t += centerText('DETALLE DEL MOVIMIENTO', ancho) + '\n';
+            t += '_'.repeat(ancho) + '\n';
+            
+            if (tipo === 'RECAUDO') {
+                // --- FORMATO RECAUDO ---
+                t += `FACTURA      : ${datosCobro.factura || 'S/N'}\n`;
+                t += `CLIENTE      : ${datosCobro.cliente || 'Consumidor Final'}\n`;
+                t += `MONTO        : $${parseFloat(datosCobro.monto).toLocaleString()}\n`;
+                t += `SALDO ANT.   : $${parseFloat(datosCobro.saldoAnterior).toLocaleString()}\n`;
+                t += `NUEVO SALDO  : $${parseFloat(datosCobro.nuevoSaldo).toLocaleString()}\n`;
+                t += `ESTADO       : ${datosCobro.estado || 'PENDIENTE'}\n`;
+                if (datosCobro.numFacturaSIIGO) {
+                    t += `SIIGO        : ${datosCobro.numFacturaSIIGO}\n`;
+                }
+                if (datosCobro.cod1) {
+                    t += `COD_1        : ${datosCobro.cod1}\n`;
+                }
+                if (datosCobro.cod2) {
+                    t += `COD_2        : ${datosCobro.cod2}\n`;
+                }
+                
+            } else if (tipo === 'EGRESO') {
+                // --- FORMATO EGRESO ---
+                t += `CUENTA DÉBITO  : ${datosCobro.trabajador || 'N/A'}\n`;
+                t += `CÓDIGO DÉBITO : ${datosCobro.trabajadorCodigo || 'N/A'}\n`;
+                t += `CUENTA CRÉDITO: ${datosCobro.cliente || 'N/A'}\n`;
+                t += `CÓDIGO CRÉDITO: ${datosCobro.clienteID || 'N/A'}\n`;
+                t += `MONTO         : $${parseFloat(datosCobro.monto).toLocaleString()}\n`;
+                if (datosCobro.cod1) {
+                    t += `COD_1         : ${datosCobro.cod1}\n`;
+                }
+                if (datosCobro.cod2) {
+                    t += `COD_2         : ${datosCobro.cod2}\n`;
+                }
+                t += `ESTADO        : ${datosCobro.estado || 'COMPLETADO'}\n`;
+                
+            } else if (tipo === 'COMPRA') {
+                // --- FORMATO COMPRA ---
+                const kilos = parseFloat(datosCobro.kilosCompra) || 0;
+                const valorUnit = parseFloat(datosCobro.valorUnitCompra) || 0;
+                const monto = parseFloat(datosCobro.monto) || 0;
+                
+                t += `CUENTA DÉBITO  : ${datosCobro.trabajador || 'N/A'}\n`;
+                t += `CÓDIGO DÉBITO : ${datosCobro.trabajadorCodigo || 'N/A'}\n`;
+                t += `CUENTA CRÉDITO: ${datosCobro.cliente || 'N/A'}\n`;
+                t += `CÓDIGO CRÉDITO: ${datosCobro.clienteID || 'N/A'}\n`;
+                t += `KILOS         : ${kilos.toFixed(2)}\n`;
+                t += `VALOR UNIT.   : $${valorUnit.toLocaleString()}\n`;
+                t += `MONTO TOTAL   : $${monto.toLocaleString()}\n`;
+                if (datosCobro.cod1) {
+                    t += `COD_1         : ${datosCobro.cod1}\n`;
+                }
+                if (datosCobro.cod2) {
+                    t += `COD_2         : ${datosCobro.cod2}\n`;
+                }
+                t += `ESTADO        : ${datosCobro.estado || 'COMPLETADO'}\n`;
+            }
+            
+            // ========== OBSERVACIONES ==========
+            if (datosCobro.observaciones && datosCobro.observaciones.trim() !== '') {
+                t += '_'.repeat(ancho) + '\n';
+                t += centerText('OBSERVACIONES', ancho) + '\n';
+                const lineas = wrapText(datosCobro.observaciones, ancho - 4);
+                for (const linea of lineas) {
+                    t += `  ${linea}\n`;
+                }
+            }
+            
+            // ========== FIRMAS ==========
+            t += '_'.repeat(ancho) + '\n';
+            t += centerText('FIRMAS DE AUTORIZACIÓN', ancho) + '\n';
+            t += '_'.repeat(ancho) + '\n\n';
+            
+            t += centerText('________________________________________', ancho) + '\n';
+            t += centerText('FIRMA QUIEN RECIBE', ancho) + '\n\n';
+            t += centerText('Nombre: ___________________', ancho) + '\n';
+            t += centerText('CC: ___________________', ancho) + '\n\n';
+            
+            t += centerText('________________________________________', ancho) + '\n';
+            t += centerText('FIRMA QUIEN ENTREGA', ancho) + '\n\n';
+            t += centerText('Nombre: ___________________', ancho) + '\n';
+            t += centerText('CC: ___________________', ancho) + '\n\n';
+            
+            // ========== PIE ==========
+            t += '_'.repeat(ancho) + '\n';
+            t += centerText('SICSa - Sistema de Cobros', ancho) + '\n';
+            t += centerText('www.sicsa.com', ancho) + '\n';
+            t += '_'.repeat(ancho) + '\n';
+            
+            return t;
+        }
+        
+        // ============================================================
+        // FUNCIÓN PARA DIVIDIR TEXTO LARGO EN MÚLTIPLES LÍNEAS
+        // ============================================================
+        function wrapText(texto, maxLen) {
+            if (!texto) return [];
+            const palabras = texto.split(' ');
+            const lineas = [];
+            let lineaActual = '';
+        
+            for (const palabra of palabras) {
+                if ((lineaActual + ' ' + palabra).length <= maxLen) {
+                    lineaActual += (lineaActual ? ' ' : '') + palabra;
+                } else {
+                    if (lineaActual) lineas.push(lineaActual);
+                    lineaActual = palabra;
+                }
+            }
+            if (lineaActual) lineas.push(lineaActual);
+        
+            return lineas;
+        }
+        
+        // ============================================================
+        // FUNCIONES AUXILIARES PARA FORMATEAR TEXTO
+        // ============================================================
+        function centerText(texto, ancho) {
+            if (texto.length >= ancho) return texto.substring(0, ancho);
+            const espacios = ancho - texto.length;
+            const izquierda = Math.floor(espacios / 2);
+            return ' '.repeat(izquierda) + texto + ' '.repeat(espacios - izquierda);
+        }
+        
+        function escapeHtml(texto) {
+            if (!texto) return '';
+            return texto.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // ============================================================
+        // FUNCIÓN PRINCIPAL: IMPRIMIR CON RAWBT
+        // ============================================================
+        function imprimirConRawBT() {
+            const statusDiv = document.getElementById('status');
+            
+            if (!ticketTexto) {
+                statusDiv.innerHTML = '❌ Error: No hay constancia para imprimir';
+                statusDiv.className = 'status status-error';
+                return;
+            }
+            
+            const ticketCodificado = encodeURIComponent(ticketTexto);
+            const intentUri = `intent:${ticketCodificado}#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;`;
+            
+            statusDiv.innerHTML = '📤 Abriendo RawBT...';
+            statusDiv.className = 'status status-info';
+            
+            window.location.href = intentUri;
+            
+            setTimeout(() => {
+                statusDiv.innerHTML = '✅ Constancia enviada a RawBT. La ventana se cerrará en 3 segundos.';
+                statusDiv.className = 'status status-success';
+            }, 1500);
+            
+            setTimeout(() => {
+                window.close();
+            }, 4000);
+        }
+        
+        // ============================================================
+        // COPIAR TICKET AL PORTAPAPELES
+        // ============================================================
+        function copiarTicket() {
+            if (!ticketTexto) {
+                alert('No hay constancia para copiar');
+                return;
+            }
+            
+            navigator.clipboard.writeText(ticketTexto).then(() => {
+                const statusDiv = document.getElementById('status');
+                statusDiv.innerHTML = '✅ Constancia copiada al portapapeles';
+                statusDiv.className = 'status status-success';
+                
+                setTimeout(() => {
+                    statusDiv.innerHTML = '⚪ Listo para imprimir';
+                    statusDiv.className = 'status status-info';
+                }, 2000);
+            }).catch(() => {
+                const statusDiv = document.getElementById('status');
+                statusDiv.innerHTML = '❌ Error al copiar. Copia manualmente.';
+                statusDiv.className = 'status status-error';
+            });
+        }
+        
+        // ============================================================
+        // CERRAR VENTANA
+        // ============================================================
+        function cerrarVentana() {
+            window.close();
+        }
+        
+        // ============================================================
+        // INICIALIZAR TODO CUANDO CARGA LA PÁGINA
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const hayDatos = leerDatosURL();
+            
+            if (!hayDatos) {
+                document.getElementById('ticketPreview').innerHTML = '⚠️ No hay datos del movimiento para imprimir';
+                document.getElementById('status').innerHTML = '⚠️ Esperando datos del sistema...';
+                document.getElementById('status').className = 'status status-warning';
+            }
+            
+            document.getElementById('btnImprimir').onclick = imprimirConRawBT;
+            document.getElementById('btnCopiar').onclick = copiarTicket;
+            document.getElementById('btnCerrar').onclick = cerrarVentana;
+        });
+    </script>
+</body>
+</html>
