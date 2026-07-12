@@ -280,8 +280,14 @@
         function leerDatosURL() {
             const urlParams = new URLSearchParams(window.location.search);
             
+            // Debug: Mostrar todos los parámetros recibidos
+            console.log('📋 PARÁMETROS RECIBIDOS:');
+            for (const [key, value] of urlParams) {
+                console.log(`  ${key}: ${value}`);
+            }
+            
             // ============================================================
-            // 🔥 RECIBIR TODOS LOS DATOS DEL MOVIMIENTO (INCLUYENDO COMPRA)
+            // 🔥 RECIBIR TODOS LOS DATOS DEL MOVIMIENTO
             // ============================================================
             datosCobro = {
                 id: urlParams.get('id') || 'S/N',
@@ -302,18 +308,40 @@
                 cod1: urlParams.get('cod1') || '',
                 cod2: urlParams.get('cod2') || '',
                 tipoOperacion: urlParams.get('tipoOperacion') || 'RECAUDO',
-                // 🔥 NUEVO: Campos específicos para COMPRA
                 kilosCompra: urlParams.get('kilosCompra') || '0',
                 valorUnitCompra: urlParams.get('valorUnitCompra') || '0'
             };
             
             montoNumerico = parseFloat(datosCobro.monto) || 0;
             
-            mostrarInfoCobro();
-            ticketTexto = generarTicketTexto();
-            document.getElementById('ticketPreview').innerText = ticketTexto;
+            console.log('📊 DATOS PROCESADOS:', datosCobro);
             
-            return datosCobro.factura !== 'S/N' || datosCobro.tipoOperacion !== 'RECAUDO';
+            // ============================================================
+            // 🔥 CORREGIDO: Verificar si hay datos
+            // ============================================================
+            const tieneId = datosCobro.id !== 'S/N';
+            const tieneFactura = datosCobro.factura !== 'S/N';
+            const tieneMonto = parseFloat(datosCobro.monto) > 0;
+            const tieneCliente = datosCobro.cliente !== 'Consumidor Final';
+            const esEgreso = datosCobro.tipoOperacion === 'EGRESO';
+            const esCompra = datosCobro.tipoOperacion === 'COMPRA';
+            
+            // ✅ CORREGIDO: Retorna true si hay datos suficientes
+            const hayDatos = tieneId || tieneFactura || tieneMonto || tieneCliente || esEgreso || esCompra;
+            
+            console.log('✅ ¿Hay datos?', hayDatos);
+            
+            if (hayDatos) {
+                mostrarInfoCobro();
+                ticketTexto = generarTicketTexto();
+                document.getElementById('ticketPreview').innerText = ticketTexto;
+            } else {
+                document.getElementById('ticketPreview').innerHTML = '⚠️ No se recibieron datos del movimiento';
+                document.getElementById('status').innerHTML = '⚠️ Esperando datos del sistema...';
+                document.getElementById('status').className = 'status status-warning';
+            }
+            
+            return hayDatos;
         }
         
         // ============================================================
@@ -508,18 +536,18 @@
             
             // ========== FIRMAS ==========
             t += '_'.repeat(ancho) + '\n';
-            t += centerText('FIRMAS DE AUTORIZACIÓN', ancho) + '\n\n\n';
-            //t += '_'.repeat(ancho) + '\n\n';
+            t += centerText('FIRMAS DE AUTORIZACIÓN', ancho) + '\n';
+            t += '_'.repeat(ancho) + '\n\n';
             
-            t += padRight('    _________________      _________________', ancho) + '\n';
-            t += padRight('FIRMA: QUIEN RECIBE          QUIEN ENTREGA', ancho) + '\n\n';
-            //t += centerText('Nombre: ___________________', ancho) + '\n';
-            //t += centerText('CC: ___________________', ancho) + '\n\n';
+            t += centerText('________________________________________', ancho) + '\n';
+            t += centerText('FIRMA QUIEN RECIBE', ancho) + '\n\n';
+            t += centerText('Nombre: ___________________', ancho) + '\n';
+            t += centerText('CC: ___________________', ancho) + '\n\n';
             
-            //t += centerText('________________________________________', ancho) + '\n';
-            //t += centerText('FIRMA QUIEN ENTREGA', ancho) + '\n\n';
-            //t += centerText('Nombre: ___________________', ancho) + '\n';
-            //t += centerText('CC: ___________________', ancho) + '\n\n';
+            t += centerText('________________________________________', ancho) + '\n';
+            t += centerText('FIRMA QUIEN ENTREGA', ancho) + '\n\n';
+            t += centerText('Nombre: ___________________', ancho) + '\n';
+            t += centerText('CC: ___________________', ancho) + '\n\n';
             
             // ========== PIE ==========
             t += '_'.repeat(ancho) + '\n';
@@ -560,6 +588,12 @@
             const espacios = ancho - texto.length;
             const izquierda = Math.floor(espacios / 2);
             return ' '.repeat(izquierda) + texto + ' '.repeat(espacios - izquierda);
+        }
+        
+        function padRight(texto, ancho) {
+            const str = String(texto);
+            if (str.length >= ancho) return str.substring(0, ancho);
+            return str + ' '.repeat(ancho - str.length);
         }
         
         function escapeHtml(texto) {
@@ -638,6 +672,7 @@
         // INICIALIZAR TODO CUANDO CARGA LA PÁGINA
         // ============================================================
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Ticket cargado correctamente');
             const hayDatos = leerDatosURL();
             
             if (!hayDatos) {
