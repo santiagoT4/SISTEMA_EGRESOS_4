@@ -441,7 +441,7 @@
             
             // ========== ENCABEZADO ==========
             t += '_'.repeat(ancho) + '\n';
-            t += centerText('CONSTANCIA DE MOVIMIENTO FINANCIERO', ancho) + '\n';
+            //t += centerText('CONSTANCIA DE MOVIMIENTO FINANCIERO', ancho) + '\n';
             t += centerText('SICSa - Sistema de Cobros', ancho) + '\n';
             t += '_'.repeat(ancho) + '\n';
             
@@ -476,7 +476,7 @@
                 t += `MONTO        : $${parseFloat(datosCobro.monto).toLocaleString()}\n`;
                 t += `SALDO ANT.   : $${parseFloat(datosCobro.saldoAnterior).toLocaleString()}\n`;
                 t += `NUEVO SALDO  : $${parseFloat(datosCobro.nuevoSaldo).toLocaleString()}\n`;
-                t += `ESTADO       : ${datosCobro.estado || 'PENDIENTE'}\n`;
+                //t += `ESTADO       : ${datosCobro.estado || 'PENDIENTE'}\n`;
                 if (datosCobro.numFacturaSIIGO) {
                     t += `SIIGO        : ${datosCobro.numFacturaSIIGO}\n`;
                 }
@@ -492,7 +492,7 @@
                 t += `CUENTA DÉBITO  : ${datosCobro.trabajador || 'N/A'}\n`;
                 t += `CÓDIGO DÉBITO : ${datosCobro.trabajadorCodigo || 'N/A'}\n`;
                 t += `CUENTA CRÉDITO: ${datosCobro.cliente || 'N/A'}\n`;
-                t += `CÓDIGO CRÉDITO: ${datosCobro.clienteID || 'N/A'}\n`;
+                t += `CÓDIGO CRÉDITO: ${datosCobro.clienteID || 'N/A'}\n\n`;
                 t += `MONTO         : $${parseFloat(datosCobro.monto).toLocaleString()}\n`;
                 if (datosCobro.cod1) {
                     t += `COD_1         : ${datosCobro.cod1}\n`;
@@ -500,7 +500,7 @@
                 if (datosCobro.cod2) {
                     t += `COD_2         : ${datosCobro.cod2}\n`;
                 }
-                t += `ESTADO        : ${datosCobro.estado || 'COMPLETADO'}\n`;
+                //t += `ESTADO        : ${datosCobro.estado || 'COMPLETADO'}\n`;
                 
             } else if (tipo === 'COMPRA') {
                 // --- FORMATO COMPRA ---
@@ -521,7 +521,7 @@
                 if (datosCobro.cod2) {
                     t += `COD_2         : ${datosCobro.cod2}\n`;
                 }
-                t += `ESTADO        : ${datosCobro.estado || 'COMPLETADO'}\n`;
+                //t += `ESTADO        : ${datosCobro.estado || 'COMPLETADO'}\n`;
             }
             
             // ========== OBSERVACIONES ==========
@@ -539,8 +539,8 @@
             t += centerText('FIRMAS DE AUTORIZACIÓN', ancho) + '\n\n\n\n';
             //t += '_'.repeat(ancho) + '\n\n';
             
-            t += padRight('     ________________     ________________', ancho) + '\n';
-            t += padRight('FIRMA: QUIEN RECIBE        QUIEN ENTREGA', ancho) + '\n\n';
+            t += padRight('     ________________     _________________', ancho) + '\n';
+            t += padRight('FIRMA: QUIEN RECIBE         QUIEN ENTREGA', ancho) + '\n\n';
             //t += centerText('Nombre: ___________________', ancho) + '\n';
             //t += centerText('CC: ___________________', ancho) + '\n\n';
             
