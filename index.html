@@ -458,7 +458,7 @@
             t += '_'.repeat(ancho) + '\n';
             
             // ========== NÚMERO Y FECHA ==========
-            t += `CONSTANCIA # : ${datosCobro.id}\n`;
+            //t += `CONSTANCIA # : ${datosCobro.id}\n`;
             t += `FECHA        : ${datosCobro.fechaCobro}\n`;
             if (datosCobro.horaRegistro) {
                 t += `HORA         : ${datosCobro.horaRegistro}\n`;
@@ -474,8 +474,8 @@
                 t += `FACTURA      : ${datosCobro.factura || 'S/N'}\n`;
                 t += `CLIENTE      : ${datosCobro.cliente || 'Consumidor Final'}\n`;
                 t += `MONTO        : $${parseFloat(datosCobro.monto).toLocaleString()}\n`;
-                t += `SALDO ANT.   : $${parseFloat(datosCobro.saldoAnterior).toLocaleString()}\n`;
-                t += `NUEVO SALDO  : $${parseFloat(datosCobro.nuevoSaldo).toLocaleString()}\n`;
+                //t += `SALDO ANT.   : $${parseFloat(datosCobro.saldoAnterior).toLocaleString()}\n`;
+                //t += `NUEVO SALDO  : $${parseFloat(datosCobro.nuevoSaldo).toLocaleString()}\n`;
                 //t += `ESTADO       : ${datosCobro.estado || 'PENDIENTE'}\n`;
                 if (datosCobro.numFacturaSIIGO) {
                     t += `SIIGO        : ${datosCobro.numFacturaSIIGO}\n`;
